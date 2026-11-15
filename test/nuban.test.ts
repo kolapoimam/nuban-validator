@@ -124,6 +124,18 @@ describe("buildNuban", () => {
     expect(buildNuban("000021457", "50547")).toBe("0000214579");
   });
 
+  it("supports 5-digit OFI codes and their 6-digit forms", () => {
+    const serial = "123000000";
+    const fiveDigitCode = "01234";
+    const sixDigitCode = "901234";
+
+    const account = buildNuban(serial, fiveDigitCode);
+
+    expect(account).toBe(buildNuban(serial, sixDigitCode));
+    expect(isValidNuban(account, fiveDigitCode)).toBe(true);
+    expect(isValidNuban(account, sixDigitCode)).toBe(true);
+  });
+
   it("always produces numbers that validate", () => {
     const codes = ["011", "044", "058", "232", "50547"];
     for (const code of codes) {
