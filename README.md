@@ -25,6 +25,7 @@ Catch typos in account numbers before you call a name enquiry API. You save the 
 
 - [Install](#install)
 - [Quick start](#quick-start)
+  - [Validate a form in the browser](#validate-a-form-in-the-browser)
 - [API](#api)
 - [Bank codes](#bank-codes)
 - [How the check works](#how-the-check-works)
@@ -54,6 +55,42 @@ Using CommonJS:
 ```js
 const { isValidNuban } = require("@kolapoimam/nuban");
 ```
+
+### Validate a form in the browser
+
+For a plain HTML page, run `npm run build` from a checkout and serve
+`dist/index.js` as `nuban.js` beside the page. Keep both values as strings so
+leading zeroes survive.
+
+```html
+<form id="payout">
+  <label>Account number <input name="account" inputmode="numeric" required></label>
+  <label>CBN bank code <input name="bank" inputmode="numeric" required></label>
+  <button>Check account</button>
+  <p id="feedback" role="status"></p>
+</form>
+<script type="module">
+  import { isValidNuban } from "./nuban.js";
+
+  const form = document.querySelector("#payout");
+  const feedback = document.querySelector("#feedback");
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const account = data.get("account");
+    const bank = data.get("bank");
+    if (!isValidNuban(account.trim(), bank.trim())) {
+      feedback.textContent = "Check the account number and CBN bank code.";
+      return;
+    }
+    feedback.textContent = "Number format looks valid. Confirm the account name next.";
+    // Call your name enquiry endpoint here.
+  });
+</script>
+```
+
+The check digit can catch mistakes. Run validation again on your server and
+confirm the account name before proceeding with a payout.
 
 ## API
 
